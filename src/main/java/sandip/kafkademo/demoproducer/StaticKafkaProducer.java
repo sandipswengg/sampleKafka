@@ -15,7 +15,7 @@ public class StaticKafkaProducer {
 	
 	public static void main(String[] args) {
 		Properties props = new Properties();
-		String topicName = "ExceptionTopic";
+		String topicName = "ExceptionManage";
 		
 		try {
 			FileReader prop_file = new FileReader("producer.properties");
