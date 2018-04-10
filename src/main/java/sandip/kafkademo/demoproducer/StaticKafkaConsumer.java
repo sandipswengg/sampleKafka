@@ -8,7 +8,9 @@ import java.util.Properties;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
-import org.apache.log4j.*;
+import org.apache.log4j.Logger;
+import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
 
 public class StaticKafkaConsumer {
 
@@ -32,15 +34,20 @@ public class StaticKafkaConsumer {
 		consumer.subscribe(Arrays.asList(topicName));
 		
 		ArrayList logLineCollection = new ArrayList();
-		
+		String line;
 		while (true) {
 			ConsumerRecords<String, String> records = consumer.poll(200);
 			List<ConsumerRecord<String, String>> lst = new ArrayList<>();
 			
 			for (ConsumerRecord<String, String> record : records) {
-				logger.debug(record.toString());
+				logger.trace(record.value());
+				
+				Object parser = JSONValue.parse(record.value());
+				JSONObject jsonObject = (JSONObject) parser;  
+				String payload = (String) jsonObject.get("payload");
+
 				try {
-					logLineCollection = AccessLogReader.logConverter(record.toString());
+					logLineCollection = AccessLogReader.logConverter(payload);
 					logger.debug(logLineCollection);
 				}
 				catch (RuntimeException e) {
